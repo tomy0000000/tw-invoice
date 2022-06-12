@@ -6,7 +6,6 @@ build-backend = "flit_core.buildapi"
 name = "tw_invoice"
 readme = "README.md"
 requires-python = "~=3.7"
-license = "MIT"
 authors = [
     {name = "Tomy Hsieh", email = "pypi@tomy.me"},
 ]
@@ -30,6 +29,19 @@ dependencies = [
     "requests >=2.6",
 ]
 dynamic = ["version", "description"]
+
+[project.license]
+file = "LICENSE"
+
+[project.optional-dependencies]
+dev = [
+    "black ~=22.1.0",
+    "isort ~=5.3.0",
+    "flake8 ~=3.8.0",
+]
+test = [
+    "pytest >=2.7.3",
+]
 
 [project.urls]
 Tracker = "https://github.com/tomy0000000/tw-invoice/issues"
