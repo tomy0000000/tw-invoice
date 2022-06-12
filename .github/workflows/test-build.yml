@@ -46,6 +46,7 @@ jobs:
   publish:
     name: Publish Package
     runs-on: ubuntu-latest
+    environment: TestPyPI
     needs: [test, style]
     if: |
       always() && (github.event_name != 'pull_request') &&
@@ -62,5 +63,9 @@ jobs:
       - name: Build package
         run: flit build
       - name: Publish package
+        env:
+          FLIT_INDEX_URL: ${{ secrets.FLIT_INDEX_URL }}
+          FLIT_USERNAME: ${{ secrets.FLIT_USERNAME }}
+          FLIT_PASSWORD: ${{ secrets.FLIT_PASSWORD }}
         run: |
-          flit publish --repository testpypi
+          flit publish
