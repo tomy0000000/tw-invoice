@@ -1,0 +1,36 @@
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "tw_invoice"
+readme = "README.md"
+requires-python = "~=3.7"
+license = "MIT"
+authors = [
+    {name = "Tomy Hsieh", email = "pypi@tomy.me"},
+]
+keywords = ["taiwan", "tw", "invoice", "tax", "taxation", "tax-invoice", "invoice-api"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Information Technology",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "requests >=2.6",
+]
+dynamic = ["version", "description"]
+
+[project.urls]
+Tracker = "https://github.com/tomy0000000/tw-invoice/issues"
+Source = "https://github.com/tomy0000000/tw-invoice"
