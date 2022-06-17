@@ -8,7 +8,7 @@ jobs:
   publish:
     name: Publish Package
     runs-on: ubuntu-latest
-    enviroments:
+    environment:
       name: PyPI
       url: https://pypi.org/project/tw_invoice/${{ github.ref_name }}/
     steps:

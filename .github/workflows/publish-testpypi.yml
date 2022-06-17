@@ -7,7 +7,7 @@ jobs:
   publish:
     name: Publish Package
     runs-on: ubuntu-latest
-    enviroments:
+    environment:
       name: TestPyPI
       url: https://test.pypi.org/project/tw_invoice/${{ steps.version.outputs.version }}/
     steps:
