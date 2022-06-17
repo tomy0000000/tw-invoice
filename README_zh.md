@@ -7,16 +7,16 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/tw_invoice)
 ![PyPI - License](https://img.shields.io/pypi/l/tw_invoice)
 
-[中文版 README](https://github.com/tomy0000000/tw-invoice/blob/main/README_zh.md)
+[English README](https://github.com/tomy0000000/tw-invoice/blob/main/README.md)
 
-SDK for Ministry of Finance, R.O.C. [E-invoice platform](https://www.einvoice.nat.gov.tw/)
+財政部電子發票整合服務平台 SDK
 
-## Usage
+## 使用說明
 
-See [Wiki](https://github.com/tomy0000000/tw-invoice/wiki)
+請見 [Wiki](https://github.com/tomy0000000/tw-invoice/wiki)
 
-## LICENSE and disclaimer
+## 授權及免責聲明
 
-The source code is released under MIT license, versions with suffix b represent beta version, use at your own risk.
+本軟體原始碼在 MIT 授權條款下發布，在版本號未移除 b (即測試版 beta) 後綴前皆為不穩定狀態，使用者需自負風險。
 
-The author is not affiliated in any kind to the platform, or MoF in any kind.
+本軟體作者並不附屬或受僱於財政部及其平台。
