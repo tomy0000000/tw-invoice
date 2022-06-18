@@ -1,15 +1,13 @@
-import hashlib
-import hmac
-import re
-from base64 import b64encode
 from datetime import date
 from random import randrange
 from time import time
-from typing import Optional
-from urllib.parse import urlencode, urljoin
+from typing import Literal, Union
+from urllib.parse import urljoin
 from uuid import uuid4
 
 from requests import Session
+
+from .utils import sign, validate_invoice_number, validate_invoice_term
 
 
 class AppAPIClient(object):
@@ -23,7 +21,7 @@ class AppAPIClient(object):
         "carrier": "/PB2CAPIVAN/Carrier/Aggregate",
     }
 
-    def __init__(self, app_id: str, api_key: str, uuid: Optional[str] = None):
+    def __init__(self, app_id: str, api_key: str, uuid: Union[str, None] = None):
         self.app_id = app_id
         self.api_key = api_key
         self.uuid = uuid if uuid else str(uuid4())
@@ -33,27 +31,11 @@ class AppAPIClient(object):
             {"Content-Type": "application/x-www-form-urlencoded"}
         )
 
-    def _sign(self, data: dict) -> str:
-        """Generate signature"""
-        data_pairs = [(name, value) for name, value in data.items() if value]
-        data_pairs.sort(key=lambda x: x[0])
-        query_string = urlencode(
-            data_pairs, quote_via=lambda k, safe, encoding, errors: k
-        )
-        signature = b64encode(
-            hmac.new(
-                key=self.api_key.encode("utf-8"),
-                msg=query_string.encode("utf-8"),
-                digestmod=hashlib.sha256,
-            ).digest()
-        ).decode("utf-8")
-        return signature
-
     def get_lottery_numbers(self, invoice_term: str) -> dict:
         """查詢中獎發票號碼清單 v0.2"""
         URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
         VERSION = 0.2
-        if not re.match(r"^\d{3}(02|04|06|08|10|12)$", invoice_term):
+        if not validate_invoice_term(invoice_term):
             raise ValueError(f"Invalid invoice_term: {invoice_term}")
         data = {
             "version": VERSION,
@@ -64,13 +46,18 @@ class AppAPIClient(object):
         }
         return self.session.post(URL, data=data).json()
 
-    def get_invoice_header(self, type: str, invoice_number: str, invoice_date: date):
-        """查詢發票表頭"""
+    def get_invoice_header(
+        self,
+        type: Literal["QRCode", "Barcode"],
+        invoice_number: str,
+        invoice_date: date,
+    ):
+        """查詢發票表頭 v0.5"""
         URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
         VERSION = 0.5
         if type not in ("QRCode", "Barcode"):
             raise ValueError("Type must be 'QRCode' or 'Barcode'")
-        if not re.match(r"^[[:upper:]]{2}\d{8}$", invoice_number):
+        if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         data = {
             "version": VERSION,
@@ -86,14 +73,14 @@ class AppAPIClient(object):
 
     def get_invoice_detail(
         self,
-        type: str,
+        type: Literal["QRCode", "Barcode"],
         invoice_number: str,
         invoice_date: date,
-        invoice_term: Optional[str] = None,
-        invoice_encrypt: Optional[str] = None,
-        seller_id: Optional[str] = None,
+        invoice_term: Union[str, None] = None,
+        invoice_encrypt: Union[str, None] = None,
+        seller_id: Union[str, None] = None,
     ):
-        """查詢發票明細"""
+        """查詢發票明細 v0.5"""
         URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
         VERSION = 0.5
         if type == "QRCode":
@@ -106,9 +93,9 @@ class AppAPIClient(object):
                 raise ValueError("invoice_term is required when type is Barcode")
         else:
             raise ValueError("Type must be 'QRCode' or 'Barcode'")
-        if not re.match(r"^[[:upper:]]{2}\d{8}$", invoice_number):
+        if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
-        if invoice_term and not re.match(r"^\d{3}(02|04|06|08|10|12)$", invoice_term):
+        if invoice_term and not validate_invoice_term(invoice_term):
             raise ValueError(f"Invalid invoice_term: {invoice_term}")
         data = {
             "version": VERSION,
@@ -174,13 +161,13 @@ class AppAPIClient(object):
         invoice_number: str,
         invoice_date: date,
         card_encrypt: str,
-        seller_name: Optional[str] = None,
-        amount: Optional[int] = None,
+        seller_name: Union[str, None] = None,
+        amount: Union[int, None] = None,
     ):
         """載具發票明細查詢 v0.5"""
         URL = urljoin(self.BASE_URL, self.PATHS["invserv"])
         VERSION = 0.5
-        if not re.match(r"^[[:upper:]]{2}\d{8}$", invoice_number):
+        if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         data = {
             "version": VERSION,
@@ -211,7 +198,7 @@ class AppAPIClient(object):
         """載具發票捐贈 v0.1"""
         URL = urljoin(self.BASE_URL, self.PATHS["donate"])
         VERSION = 0.1
-        if not re.match(r"^[[:upper:]]{2}\d{8}$", invoice_number):
+        if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         data = {
             "version": VERSION,
@@ -228,7 +215,7 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        signature = self._sign(data)
+        signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
         return self.session.post(URL, data=data).json()
@@ -253,7 +240,7 @@ class AppAPIClient(object):
             "timeStamp": int(time()),
             "uuid": self.uuid,
         }
-        signature = self._sign(data)
+        signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
         return self.session.post(URL, data=data).json()
