@@ -4,6 +4,10 @@ import re
 from base64 import b64encode
 from urllib.parse import urlencode
 
+from requests.models import Response
+
+from .exceptions import APIError
+
 
 def sign(data: dict, key: str) -> str:
     """Generate signature"""
@@ -18,6 +22,15 @@ def sign(data: dict, key: str) -> str:
         ).digest()
     ).decode("utf-8")
     return signature
+
+
+def check_api_error(response: Response) -> dict:
+    """Check API error"""
+    response.raise_for_status()
+    data = response.json()
+    if data["code"] != "200":
+        raise APIError(data["code"], data["msg"])
+    return data
 
 
 def validate_invoice_number(einvoice_number: str) -> bool:

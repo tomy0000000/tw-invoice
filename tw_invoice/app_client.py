@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from requests import Session
 
-from .utils import sign, validate_invoice_number, validate_invoice_term
+from .utils import check_api_error, sign, validate_invoice_number, validate_invoice_term
 
 
 class AppAPIClient(object):
@@ -53,7 +53,8 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_invoice_header(
         self,
@@ -78,7 +79,8 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_invoice_detail(
         self,
@@ -120,7 +122,8 @@ class AppAPIClient(object):
             "random": f"{randrange(10001):0>4}",
             "appID": self.app_id,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_love_code(self, query: str) -> dict:
         """捐贈碼查詢 v0.2"""
@@ -133,7 +136,8 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_carrier_invoices_header(
         self,
@@ -161,7 +165,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_carrier_invoices_detail(
         self,
@@ -193,7 +198,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def carrier_donate_invoice(
         self,
@@ -227,7 +233,8 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
 
     def get_aggregate_carrier(
         self,
@@ -252,4 +259,5 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        return self.session.post(URL, data=data).json()
+        results = check_api_error(self.session.post(URL, data=data))
+        return results
