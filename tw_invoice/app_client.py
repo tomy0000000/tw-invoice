@@ -21,10 +21,19 @@ class AppAPIClient(object):
         "carrier": "/PB2CAPIVAN/Carrier/Aggregate",
     }
 
-    def __init__(self, app_id: str, api_key: str, uuid: Union[str, None] = None):
+    def __init__(
+        self,
+        app_id: str,
+        api_key: str,
+        uuid: Union[str, None] = None,
+        ts_tolerance: int = 20,
+    ):
         self.app_id = app_id
         self.api_key = api_key
         self.uuid = uuid if uuid else str(uuid4())
+        if ts_tolerance < 10 or ts_tolerance > 180:
+            raise ValueError("ts_tolerance must be between 10 and 180")
+        self.ts_tolerance = ts_tolerance
         self.serial = 1
         self.session = Session()
         self.session.headers.update(
@@ -144,7 +153,7 @@ class AppAPIClient(object):
             "cardNo": card_number,
             "expTimeStamp": "2147483647",
             "action": "carrierInvChk",
-            "timeStamp": int(time()),
+            "timeStamp": int(time() + self.ts_tolerance),
             "startDate": start_date.strftime("%Y/%m/%d"),
             "endDate": end_date.strftime("%Y/%m/%d"),
             "onlyWinningInv": "Y" if only_winning else "N",
@@ -175,7 +184,7 @@ class AppAPIClient(object):
             "cardNo": card_number,
             "expTimeStamp": "2147483647",
             "action": "carrierInvDetail",
-            "timeStamp": int(time()),
+            "timeStamp": int(time() + self.ts_tolerance),
             "invNum": invoice_number,
             "invDate": invoice_date.strftime("%Y/%m/%d"),
             "uuid": self.uuid,
@@ -207,7 +216,7 @@ class AppAPIClient(object):
             "cardNo": card_number,
             "expTimeStamp": "2147483647",
             "action": "carrierInvDnt",
-            "timeStamp": int(time()),
+            "timeStamp": int(time() + self.ts_tolerance),
             "invDate": invoice_date.strftime("%Y/%m/%d"),
             "invNum": invoice_number,
             "npoBan": love_code,
@@ -237,7 +246,7 @@ class AppAPIClient(object):
             "cardNo": card_number,
             "cardEncrypt": card_encrypt,
             "appID": self.app_id,
-            "timeStamp": int(time()),
+            "timeStamp": int(time() + self.ts_tolerance),
             "uuid": self.uuid,
         }
         signature = sign(data, self.api_key)
