@@ -303,6 +303,16 @@ def test_get_carrier_invoices_header(client, mocker):
 
 
 def test_get_carrier_invoices_detail(client, mocker):
+    # Test invalid invoice number
+    with pytest.raises(ValueError):
+        client.get_carrier_invoices_detail(
+            card_type=TEST_CARD_TYPE,
+            card_number=TEST_CARD_NUMBER,
+            invoice_number="invalid invoice number",
+            invoice_date=TEST_DATE,
+            card_encrypt=TEST_CARD_ENCRYPT,
+        )
+
     # Mock the API response
     mocked_time = mocker.patch("tw_invoice.app_client.time", return_value=TEST_TIME)
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")

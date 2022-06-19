@@ -6,10 +6,10 @@ from urllib.parse import urlencode, urljoin
 
 from requests.models import Response
 
-from .exceptions import APIError
+from .exception import APIError
 
 
-def build_api_url(id: str):
+def build_api_url(id: str) -> str:
     BASE_URL = "https://api.einvoice.nat.gov.tw"
     PATHS = {
         "invapp": "/PB2CAPIVAN/invapp/InvApp",
@@ -18,7 +18,6 @@ def build_api_url(id: str):
         "donate": "/PB2CAPIVAN/CarInv/Donate",
         "carrier": "/PB2CAPIVAN/Carrier/Aggregate",
     }
-
     return urljoin(BASE_URL, PATHS[id])
 
 
@@ -39,6 +38,8 @@ def sign(data: dict, key: str) -> str:
 
 def check_api_error(response: Response) -> dict:
     """Check API error"""
+    if not isinstance(response, Response):
+        raise TypeError("response must be a Response object")
     response.raise_for_status()
     data = response.json()
     if data["code"] != "200":
@@ -46,16 +47,22 @@ def check_api_error(response: Response) -> dict:
     return data
 
 
-def validate_invoice_number(einvoice_number: str) -> bool:
+def validate_invoice_number(invoice_number: str) -> bool:
     """Validate einvoice number"""
-    return re.match(r"^[A-Z]{2}\d{8}$", einvoice_number)
+    if not isinstance(invoice_number, str):
+        return False
+    return bool(re.match(r"^[A-Z]{2}\d{8}$", invoice_number))
 
 
 def validate_invoice_term(invoice_term: str) -> bool:
     """Validate invoice term"""
-    return re.match(r"^\d{3}(02|04|06|08|10|12)$", invoice_term)
+    if not isinstance(invoice_term, str):
+        return False
+    return bool(re.match(r"^\d{3}(02|04|06|08|10|12)$", invoice_term))
 
 
 def validate_phone_barcode(phone_barcode: str) -> bool:
     """Validate phone barcode"""
-    return re.match(r"^\/[A-Z0-9+.-]{7}$", phone_barcode)
+    if not isinstance(phone_barcode, str):
+        return False
+    return bool(re.match(r"^\/[A-Z0-9+.-]{7}$", phone_barcode))
