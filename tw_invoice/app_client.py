@@ -2,25 +2,20 @@ from datetime import date
 from random import randrange
 from time import time
 from typing import Literal, Union
-from urllib.parse import urljoin
 from uuid import uuid4
 
 from requests import Session
 
-from .utils import check_api_error, sign, validate_invoice_number, validate_invoice_term
+from .utils import (
+    build_api_url,
+    check_api_error,
+    sign,
+    validate_invoice_number,
+    validate_invoice_term,
+)
 
 
 class AppAPIClient(object):
-
-    BASE_URL = "https://api.einvoice.nat.gov.tw"
-    PATHS = {
-        "invapp": "/PB2CAPIVAN/invapp/InvApp",
-        "lovecode": "/PB2CAPIVAN/loveCodeapp/qryLoveCode",
-        "invserv": "/PB2CAPIVAN/invServ/InvServ",
-        "donate": "/PB2CAPIVAN/CarInv/Donate",
-        "carrier": "/PB2CAPIVAN/Carrier/Aggregate",
-    }
-
     def __init__(
         self,
         app_id: str,
@@ -42,7 +37,7 @@ class AppAPIClient(object):
 
     def get_lottery_numbers(self, invoice_term: str) -> dict:
         """查詢中獎發票號碼清單 v0.2"""
-        URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
+        URL = build_api_url("invapp")
         VERSION = 0.2
         if not validate_invoice_term(invoice_term):
             raise ValueError(f"Invalid invoice_term: {invoice_term}")
@@ -58,20 +53,20 @@ class AppAPIClient(object):
 
     def get_invoice_header(
         self,
-        type: Literal["QRCode", "Barcode"],
+        barcode_type: Literal["QRCode", "Barcode"],
         invoice_number: str,
         invoice_date: date,
     ):
         """查詢發票表頭 v0.5"""
-        URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
+        URL = build_api_url("invapp")
         VERSION = 0.5
-        if type not in ("QRCode", "Barcode"):
+        if barcode_type not in ("QRCode", "Barcode"):
             raise ValueError("Type must be 'QRCode' or 'Barcode'")
         if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         data = {
             "version": VERSION,
-            "type": type,
+            "type": barcode_type,
             "invNum": invoice_number,
             "action": "qryInvHeader",
             "generation": "V2",
@@ -84,7 +79,7 @@ class AppAPIClient(object):
 
     def get_invoice_detail(
         self,
-        type: Literal["QRCode", "Barcode"],
+        barcode_type: Literal["QRCode", "Barcode"],
         invoice_number: str,
         invoice_date: date,
         invoice_term: Union[str, None] = None,
@@ -92,34 +87,38 @@ class AppAPIClient(object):
         seller_id: Union[str, None] = None,
     ):
         """查詢發票明細 v0.5"""
-        URL = urljoin(self.BASE_URL, self.PATHS["invapp"])
+        URL = build_api_url("invapp")
         VERSION = 0.5
-        if type == "QRCode":
+        if barcode_type == "QRCode":
             if not invoice_encrypt:
-                raise ValueError("invoice_encrypt is required when type is QRCode")
+                raise ValueError(
+                    "invoice_encrypt is required when barcode_type is QRCode"
+                )
             if not seller_id:
-                raise ValueError("seller_id is required when type is QRCode")
-        elif type == "Barcode":
+                raise ValueError("seller_id is required when barcode_type is QRCode")
+        elif barcode_type == "Barcode":
             if not invoice_term:
-                raise ValueError("invoice_term is required when type is Barcode")
+                raise ValueError(
+                    "invoice_term is required when barcode_type is Barcode"
+                )
         else:
-            raise ValueError("Type must be 'QRCode' or 'Barcode'")
+            raise ValueError("barcode_type must be 'QRCode' or 'Barcode'")
         if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         if invoice_term and not validate_invoice_term(invoice_term):
             raise ValueError(f"Invalid invoice_term: {invoice_term}")
         data = {
             "version": VERSION,
-            "type": type,
+            "type": barcode_type,
             "invNum": invoice_number,
             "action": "qryInvDetail",
             "generation": "V2",
             "invTerm": invoice_term,
             "invDate": invoice_date.strftime("%Y/%m/%d"),
-            "encrypt": invoice_encrypt if invoice_encrypt else None,
-            "sellerID": seller_id if seller_id else None,
+            "encrypt": invoice_encrypt,
+            "sellerID": seller_id,
             "UUID": self.uuid,
-            "random": f"{randrange(10001):0>4}",
+            "randomNumber": str(randrange(10001)).zfill(4),
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
@@ -127,7 +126,7 @@ class AppAPIClient(object):
 
     def get_love_code(self, query: str) -> dict:
         """捐贈碼查詢 v0.2"""
-        URL = urljoin(self.BASE_URL, self.PATHS["lovecode"])
+        URL = build_api_url("lovecode")
         VERSION = 0.2
         data = {
             "version": VERSION,
@@ -149,7 +148,7 @@ class AppAPIClient(object):
         only_winning: bool = False,
     ):
         """載具發票表頭查詢 v0.5"""
-        URL = urljoin(self.BASE_URL, self.PATHS["invserv"])
+        URL = build_api_url("invserv")
         VERSION = 0.5
         data = {
             "version": VERSION,
@@ -179,7 +178,7 @@ class AppAPIClient(object):
         amount: Union[int, None] = None,
     ):
         """載具發票明細查詢 v0.5"""
-        URL = urljoin(self.BASE_URL, self.PATHS["invserv"])
+        URL = build_api_url("invserv")
         VERSION = 0.5
         if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
@@ -193,8 +192,8 @@ class AppAPIClient(object):
             "invNum": invoice_number,
             "invDate": invoice_date.strftime("%Y/%m/%d"),
             "uuid": self.uuid,
-            "sellerName": seller_name if seller_name else None,
-            "amount": amount if amount else None,
+            "sellerName": seller_name,
+            "amount": amount,
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
@@ -211,7 +210,7 @@ class AppAPIClient(object):
         card_encrypt: str,
     ):
         """載具發票捐贈 v0.1"""
-        URL = urljoin(self.BASE_URL, self.PATHS["donate"])
+        URL = build_api_url("donate")
         VERSION = 0.1
         if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
@@ -243,7 +242,7 @@ class AppAPIClient(object):
         card_encrypt: str,
     ):
         """手機條碼歸戶載具查詢 v1.0"""
-        URL = urljoin(self.BASE_URL, self.PATHS["carrier"])
+        URL = build_api_url("carrier")
         VERSION = 1.0
         data = {
             "version": VERSION,

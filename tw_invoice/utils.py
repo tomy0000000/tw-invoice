@@ -2,11 +2,24 @@ import hashlib
 import hmac
 import re
 from base64 import b64encode
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 from requests.models import Response
 
 from .exceptions import APIError
+
+
+def build_api_url(id: str):
+    BASE_URL = "https://api.einvoice.nat.gov.tw"
+    PATHS = {
+        "invapp": "/PB2CAPIVAN/invapp/InvApp",
+        "lovecode": "/PB2CAPIVAN/loveCodeapp/qryLoveCode",
+        "invserv": "/PB2CAPIVAN/invServ/InvServ",
+        "donate": "/PB2CAPIVAN/CarInv/Donate",
+        "carrier": "/PB2CAPIVAN/Carrier/Aggregate",
+    }
+
+    return urljoin(BASE_URL, PATHS[id])
 
 
 def sign(data: dict, key: str) -> str:
