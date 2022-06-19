@@ -1,8 +1,13 @@
 from datetime import date
 from random import randrange
 from time import time
-from typing import Literal, Union
+from typing import Union
 from uuid import uuid4
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from requests import Session
 
