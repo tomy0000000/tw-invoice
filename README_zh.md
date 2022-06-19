@@ -1,7 +1,7 @@
 # 🇹🇼 Taiwan Invoice
 
 [![PyPI](https://img.shields.io/pypi/v/tw_invoice?logo=pypi)](https://pypi.org/project/tw_invoice)
-[![Test and Build](https://github.com/tomy0000000/tw-invoice/actions/workflows/test-build.yml/badge.svg)](https://github.com/tomy0000000/tw-invoice/actions/workflows/test-build.yml)
+[![Test](https://github.com/tomy0000000/tw-invoice/actions/workflows/test.yml/badge.svg)](https://github.com/tomy0000000/tw-invoice/actions/workflows/test.yml)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/tomy0000000/tw-invoice/main.svg)](https://results.pre-commit.ci/latest/github/tomy0000000/tw-invoice/main)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/tw_invoice?logo=python&logoColor=white)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/tw_invoice)
