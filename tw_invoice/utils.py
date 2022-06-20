@@ -42,7 +42,7 @@ def check_api_error(response: Response) -> dict:
         raise TypeError("response must be a Response object")
     response.raise_for_status()
     data = response.json()
-    if data["code"] != "200":
+    if int(data["code"]) != 200:
         raise APIError(data["code"], data["msg"])
     return data
 
