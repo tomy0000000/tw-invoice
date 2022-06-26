@@ -42,7 +42,7 @@ class AppAPIClient(object):
     ):
         self.app_id = app_id
         self.api_key = api_key
-        self.uuid = uuid if uuid else str(uuid4())
+        self.uuid = str(uuid) if uuid else str(uuid4())
         if ts_tolerance < 10 or ts_tolerance > 180:
             raise ValueError("ts_tolerance must be between 10 and 180")
         self.ts_tolerance = ts_tolerance
@@ -130,12 +130,12 @@ class AppAPIClient(object):
                 raise ValueError(
                     "invoice_term is required when barcode_type is Barcode"
                 )
+            if not validate_invoice_term(invoice_term):
+                raise ValueError(f"Invalid invoice_term: {invoice_term}")
         else:
             raise ValueError("barcode_type must be 'QRCode' or 'Barcode'")
         if not validate_invoice_number(invoice_number):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
-        if invoice_term and not validate_invoice_term(invoice_term):
-            raise ValueError(f"Invalid invoice_term: {invoice_term}")
         if not validate_invoice_random(invoice_random):
             raise ValueError(f"Invalid invoice random: {invoice_random}")
         data = {
