@@ -54,6 +54,13 @@ def validate_invoice_number(invoice_number: str) -> bool:
     return bool(re.match(r"^[A-Z]{2}\d{8}$", invoice_number))
 
 
+def validate_invoice_random(invoice_random: str) -> bool:
+    """Validate invoice random"""
+    if not isinstance(invoice_random, str):
+        return False
+    return bool(re.match(r"^\d{4}$", invoice_random))
+
+
 def validate_invoice_term(invoice_term: str) -> bool:
     """Validate invoice term"""
     if not isinstance(invoice_term, str):

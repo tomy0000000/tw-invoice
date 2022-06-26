@@ -12,12 +12,11 @@ TEST_CARD_NUMBER = "/AB12+-."
 TEST_CARD_TYPE = "3J0002"
 TEST_DATE = date(2020, 1, 1)
 TEST_DATE_STR = "2020/01/01"
-TEST_INVOICE_ENCRYPT = "ba1ddcbbb6f1183a"
+TEST_INVOICE_ENCRYPT = "a622ef9b2099f91c86dd135a"
 TEST_INVOICE_NUMBER = "AB12345678"
+TEST_INVOICE_RANDOM = "0123"
 TEST_INVOICE_TERM = "10902"
 TEST_LOVE_CODE = "0"
-TEST_RANDOM_NUMBER = 123
-TEST_RANDOM_NUMBER_STR = "0123"
 TEST_SELLER_ID = "12345678"
 TEST_TIME = 1655654400
 TEST_TS_TOLERANCE = 30
@@ -135,6 +134,7 @@ def test_get_invoice_detail(client, mocker):
             barcode_type="invalid barcode",
             invoice_number=TEST_INVOICE_NUMBER,
             invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
         )
 
     # Test QRCode without invoice encrypt
@@ -143,6 +143,17 @@ def test_get_invoice_detail(client, mocker):
             barcode_type="QRCode",
             invoice_number=TEST_INVOICE_NUMBER,
             invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
+        )
+
+    # Test QRCode invalid invoice encrypt
+    with pytest.raises(ValueError):
+        client.get_invoice_detail(
+            barcode_type="QRCode",
+            invoice_number=TEST_INVOICE_NUMBER,
+            invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
+            invoice_encrypt="invalid invoice encrypt",
         )
 
     # Test QRCode without seller id
@@ -151,6 +162,7 @@ def test_get_invoice_detail(client, mocker):
             barcode_type="QRCode",
             invoice_number=TEST_INVOICE_NUMBER,
             invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
             invoice_encrypt=TEST_INVOICE_ENCRYPT,
         )
 
@@ -160,16 +172,7 @@ def test_get_invoice_detail(client, mocker):
             barcode_type="Barcode",
             invoice_number=TEST_INVOICE_NUMBER,
             invoice_date=TEST_DATE,
-        )
-
-    # Test invalid invoice number
-    with pytest.raises(ValueError):
-        client.get_invoice_detail(
-            barcode_type="QRCode",
-            invoice_number="invalid invoice number",
-            invoice_date=TEST_DATE,
-            invoice_encrypt=TEST_INVOICE_ENCRYPT,
-            seller_id=TEST_SELLER_ID,
+            invoice_random=TEST_INVOICE_RANDOM,
         )
 
     # Test invalid invoice term
@@ -178,13 +181,33 @@ def test_get_invoice_detail(client, mocker):
             barcode_type="Barcode",
             invoice_number=TEST_INVOICE_NUMBER,
             invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
             invoice_term="invalid invoice term",
         )
 
+    # Test invalid invoice number
+    with pytest.raises(ValueError):
+        client.get_invoice_detail(
+            barcode_type="QRCode",
+            invoice_number="invalid invoice number",
+            invoice_date=TEST_DATE,
+            invoice_random=TEST_INVOICE_RANDOM,
+            invoice_encrypt=TEST_INVOICE_ENCRYPT,
+            seller_id=TEST_SELLER_ID,
+        )
+
+    # Test invalid invoice random
+    with pytest.raises(ValueError):
+        client.get_invoice_detail(
+            barcode_type="QRCode",
+            invoice_number=TEST_INVOICE_NUMBER,
+            invoice_date=TEST_DATE,
+            invoice_random="invalid invoice random",
+            invoice_encrypt=TEST_INVOICE_ENCRYPT,
+            seller_id=TEST_SELLER_ID,
+        )
+
     # Mock the API response
-    mocked_randrange = mocker.patch(
-        "tw_invoice.app_client.randrange", return_value=TEST_RANDOM_NUMBER
-    )
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
 
@@ -192,10 +215,10 @@ def test_get_invoice_detail(client, mocker):
         barcode_type="QRCode",
         invoice_number=TEST_INVOICE_NUMBER,
         invoice_date=TEST_DATE,
+        invoice_random=TEST_INVOICE_RANDOM,
         invoice_encrypt=TEST_INVOICE_ENCRYPT,
         seller_id=TEST_SELLER_ID,
     )
-    mocked_randrange.assert_called_once()
     mocked_session_post.assert_called_once_with(
         build_api_url("invapp"),
         data={
@@ -209,16 +232,13 @@ def test_get_invoice_detail(client, mocker):
             "encrypt": TEST_INVOICE_ENCRYPT,
             "sellerID": TEST_SELLER_ID,
             "UUID": TEST_UUID,
-            "randomNumber": TEST_RANDOM_NUMBER_STR,
+            "randomNumber": TEST_INVOICE_RANDOM,
             "appID": TEST_APP_ID,
         },
     )
     mocked_check_api_error.assert_called_once()
 
     # Mock the API response
-    mocked_randrange = mocker.patch(
-        "tw_invoice.app_client.randrange", return_value=TEST_RANDOM_NUMBER
-    )
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
 
@@ -226,9 +246,9 @@ def test_get_invoice_detail(client, mocker):
         barcode_type="Barcode",
         invoice_number=TEST_INVOICE_NUMBER,
         invoice_date=TEST_DATE,
+        invoice_random=TEST_INVOICE_RANDOM,
         invoice_term=TEST_INVOICE_TERM,
     )
-    mocked_randrange.assert_called_once()
     mocked_session_post.assert_called_once_with(
         build_api_url("invapp"),
         data={
@@ -242,7 +262,7 @@ def test_get_invoice_detail(client, mocker):
             "encrypt": None,
             "sellerID": None,
             "UUID": TEST_UUID,
-            "randomNumber": TEST_RANDOM_NUMBER_STR,
+            "randomNumber": TEST_INVOICE_RANDOM,
             "appID": TEST_APP_ID,
         },
     )

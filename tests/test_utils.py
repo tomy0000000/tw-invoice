@@ -6,6 +6,7 @@ from tw_invoice.exception import APIError
 from tw_invoice.utils import (
     check_api_error,
     validate_invoice_number,
+    validate_invoice_random,
     validate_invoice_term,
     validate_phone_barcode,
 )
@@ -70,6 +71,14 @@ def test_validate_invoice_number():
     assert not validate_invoice_number("12345678")
     assert not validate_invoice_number("ab12345678")
     assert validate_invoice_number("AB12345678")
+
+
+def test_validate_invoice_random():
+    assert not validate_invoice_random(None)
+    assert not validate_invoice_random("")
+    assert not validate_invoice_random("abcd")
+    assert not validate_invoice_random("56789")
+    assert validate_invoice_random("0123")
 
 
 def test_validate_invoice_term():

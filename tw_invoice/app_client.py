@@ -1,5 +1,4 @@
 from datetime import date
-from random import randrange
 from time import time
 from typing import Union
 from uuid import uuid4
@@ -16,6 +15,7 @@ from .utils import (
     check_api_error,
     sign,
     validate_invoice_number,
+    validate_invoice_random,
     validate_invoice_term,
 )
 
@@ -87,6 +87,7 @@ class AppAPIClient(object):
         barcode_type: Literal["QRCode", "Barcode"],
         invoice_number: str,
         invoice_date: date,
+        invoice_random: str,
         invoice_term: Union[str, None] = None,
         invoice_encrypt: Union[str, None] = None,
         seller_id: Union[str, None] = None,
@@ -99,6 +100,8 @@ class AppAPIClient(object):
                 raise ValueError(
                     "invoice_encrypt is required when barcode_type is QRCode"
                 )
+            if not isinstance(invoice_encrypt, str) or len(invoice_encrypt) != 24:
+                raise ValueError("invoice_encrypt must be a string of 24 characters")
             if not seller_id:
                 raise ValueError("seller_id is required when barcode_type is QRCode")
         elif barcode_type == "Barcode":
@@ -112,6 +115,8 @@ class AppAPIClient(object):
             raise ValueError(f"Invalid invoice number: {invoice_number}")
         if invoice_term and not validate_invoice_term(invoice_term):
             raise ValueError(f"Invalid invoice_term: {invoice_term}")
+        if not validate_invoice_random(invoice_random):
+            raise ValueError(f"Invalid invoice random: {invoice_random}")
         data = {
             "version": VERSION,
             "type": barcode_type,
@@ -123,7 +128,7 @@ class AppAPIClient(object):
             "encrypt": invoice_encrypt,
             "sellerID": seller_id,
             "UUID": self.uuid,
-            "randomNumber": str(randrange(10001)).zfill(4),
+            "randomNumber": invoice_random,
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
