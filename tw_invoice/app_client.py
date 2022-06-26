@@ -3,6 +3,17 @@ from time import time
 from typing import Union
 from uuid import uuid4
 
+from .schema import (
+    AggregateCarrierResponse,
+    CarrierInvoiceDonateResponse,
+    CarrierInvoicesDetailResponse,
+    CarrierInvoicesHeaderResponse,
+    InvoiceDetailResponse,
+    InvoiceHeaderResponse,
+    LotteryNumberResponse,
+    LoveCodeResponse,
+)
+
 try:
     from typing import Literal
 except ImportError:
@@ -27,6 +38,7 @@ class AppAPIClient(object):
         api_key: str,
         uuid: Union[str, None] = None,
         ts_tolerance: int = 20,
+        skip_validation: bool = False,
     ):
         self.app_id = app_id
         self.api_key = api_key
@@ -34,13 +46,18 @@ class AppAPIClient(object):
         if ts_tolerance < 10 or ts_tolerance > 180:
             raise ValueError("ts_tolerance must be between 10 and 180")
         self.ts_tolerance = ts_tolerance
+        if not isinstance(skip_validation, bool):
+            raise ValueError("skip_validation must be a boolean")
+        self.skip_validation = skip_validation
         self.serial = 1
         self.session = Session()
         self.session.headers.update(
             {"Content-Type": "application/x-www-form-urlencoded"}
         )
 
-    def get_lottery_numbers(self, invoice_term: str) -> dict:
+    def get_lottery_numbers(
+        self, invoice_term: str
+    ) -> Union[LotteryNumberResponse, dict]:
         """查詢中獎發票號碼清單 v0.2"""
         URL = build_api_url("invapp")
         VERSION = 0.2
@@ -54,6 +71,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = LotteryNumberResponse.parse_obj(results)
         return results
 
     def get_invoice_header(
@@ -61,7 +80,7 @@ class AppAPIClient(object):
         barcode_type: Literal["QRCode", "Barcode"],
         invoice_number: str,
         invoice_date: date,
-    ):
+    ) -> Union[InvoiceHeaderResponse, dict]:
         """查詢發票表頭 v0.5"""
         URL = build_api_url("invapp")
         VERSION = 0.5
@@ -80,6 +99,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = InvoiceHeaderResponse.parse_obj(results)
         return results
 
     def get_invoice_detail(
@@ -132,6 +153,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = InvoiceDetailResponse.parse_obj(results)
         return results
 
     def get_love_code(self, query: str) -> dict:
@@ -146,6 +169,8 @@ class AppAPIClient(object):
             "appID": self.app_id,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = LoveCodeResponse.parse_obj(results)
         return results
 
     def get_carrier_invoices_header(
@@ -156,7 +181,7 @@ class AppAPIClient(object):
         end_date: date,
         card_encrypt: str,
         only_winning: bool = False,
-    ):
+    ) -> Union[dict, CarrierInvoicesHeaderResponse]:
         """載具發票表頭查詢 v0.5"""
         URL = build_api_url("invserv")
         VERSION = 0.5
@@ -175,6 +200,8 @@ class AppAPIClient(object):
             "cardEncrypt": card_encrypt,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = CarrierInvoicesHeaderResponse.parse_obj(results)
         return results
 
     def get_carrier_invoices_detail(
@@ -186,7 +213,7 @@ class AppAPIClient(object):
         card_encrypt: str,
         seller_name: Union[str, None] = None,
         amount: Union[int, None] = None,
-    ):
+    ) -> Union[dict, CarrierInvoicesDetailResponse]:
         """載具發票明細查詢 v0.5"""
         URL = build_api_url("invserv")
         VERSION = 0.5
@@ -208,6 +235,8 @@ class AppAPIClient(object):
             "cardEncrypt": card_encrypt,
         }
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = CarrierInvoicesDetailResponse.parse_obj(results)
         return results
 
     def carrier_donate_invoice(
@@ -243,6 +272,8 @@ class AppAPIClient(object):
         data["signature"] = signature
         self.serial += 1
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = CarrierInvoiceDonateResponse.parse_obj(results)
         return results
 
     def get_aggregate_carrier(
@@ -250,7 +281,7 @@ class AppAPIClient(object):
         card_type: str,
         card_number: str,
         card_encrypt: str,
-    ):
+    ) -> Union[dict, AggregateCarrierResponse]:
         """手機條碼歸戶載具查詢 v1.0"""
         URL = build_api_url("carrier")
         VERSION = 1.0
@@ -269,4 +300,6 @@ class AppAPIClient(object):
         data["signature"] = signature
         self.serial += 1
         results = check_api_error(self.session.post(URL, data=data))
+        if not self.skip_validation:
+            results = AggregateCarrierResponse.parse_obj(results)
         return results

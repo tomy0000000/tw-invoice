@@ -60,6 +60,11 @@ def test_init_with_invalid_ts_tolerance():
         AppAPIClient(TEST_APP_ID, TEST_API_KEY, ts_tolerance=181)
 
 
+def test_init_with_invalid_skip_validation():
+    with pytest.raises(ValueError):
+        AppAPIClient(TEST_APP_ID, TEST_API_KEY, skip_validation="invalid")
+
+
 def test_get_lottery_numbers(client, mocker):
     with pytest.raises(ValueError):
         client.get_lottery_numbers("2022-04-23")
@@ -67,6 +72,9 @@ def test_get_lottery_numbers(client, mocker):
     # Mock the API response
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.LotteryNumberResponse.parse_obj"
+    )
 
     client.get_lottery_numbers("11006")
     mocked_session_post.assert_called_once_with(
@@ -80,6 +88,7 @@ def test_get_lottery_numbers(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
 
 def test_get_invoice_header(client, mocker):
@@ -104,6 +113,9 @@ def test_get_invoice_header(client, mocker):
         )
         mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
         mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+        mocked_parse_obj = mocker.patch(
+            "tw_invoice.app_client.InvoiceHeaderResponse.parse_obj"
+        )
 
         client.get_invoice_header(
             barcode_type=barcode_type,
@@ -125,6 +137,7 @@ def test_get_invoice_header(client, mocker):
             },
         )
         mocked_check_api_error.assert_called_once()
+        mocked_parse_obj.assert_called_once()
 
 
 def test_get_invoice_detail(client, mocker):
@@ -210,6 +223,9 @@ def test_get_invoice_detail(client, mocker):
     # Mock the API response
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.InvoiceDetailResponse.parse_obj"
+    )
 
     client.get_invoice_detail(
         barcode_type="QRCode",
@@ -237,10 +253,14 @@ def test_get_invoice_detail(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
     # Mock the API response
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.InvoiceDetailResponse.parse_obj"
+    )
 
     client.get_invoice_detail(
         barcode_type="Barcode",
@@ -267,12 +287,14 @@ def test_get_invoice_detail(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
 
 def test_get_love_code(client, mocker):
     # Mock the API response
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch("tw_invoice.app_client.LoveCodeResponse.parse_obj")
 
     client.get_love_code("test-query")
     mocked_session_post.assert_called_once_with(
@@ -286,6 +308,7 @@ def test_get_love_code(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
 
 def test_get_carrier_invoices_header(client, mocker):
@@ -293,6 +316,9 @@ def test_get_carrier_invoices_header(client, mocker):
     mocked_time = mocker.patch("tw_invoice.app_client.time", return_value=TEST_TIME)
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.CarrierInvoicesHeaderResponse.parse_obj"
+    )
 
     client.get_carrier_invoices_header(
         card_type=TEST_CARD_TYPE,
@@ -320,6 +346,7 @@ def test_get_carrier_invoices_header(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
 
 def test_get_carrier_invoices_detail(client, mocker):
@@ -337,6 +364,9 @@ def test_get_carrier_invoices_detail(client, mocker):
     mocked_time = mocker.patch("tw_invoice.app_client.time", return_value=TEST_TIME)
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.CarrierInvoicesDetailResponse.parse_obj"
+    )
 
     client.get_carrier_invoices_detail(
         card_type=TEST_CARD_TYPE,
@@ -365,6 +395,7 @@ def test_get_carrier_invoices_detail(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
 
 
 def test_carrier_donate_invoice(client, mocker):
@@ -382,6 +413,9 @@ def test_carrier_donate_invoice(client, mocker):
     mocked_time = mocker.patch("tw_invoice.app_client.time", return_value=TEST_TIME)
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.CarrierInvoiceDonateResponse.parse_obj"
+    )
 
     client.carrier_donate_invoice(
         card_type=TEST_CARD_TYPE,
@@ -412,6 +446,7 @@ def test_carrier_donate_invoice(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
     assert client.serial == 2
 
 
@@ -420,6 +455,9 @@ def test_get_aggregate_carrier(client, mocker):
     mocked_time = mocker.patch("tw_invoice.app_client.time", return_value=TEST_TIME)
     mocked_session_post = mocker.patch("tw_invoice.app_client.Session.post")
     mocked_check_api_error = mocker.patch("tw_invoice.app_client.check_api_error")
+    mocked_parse_obj = mocker.patch(
+        "tw_invoice.app_client.AggregateCarrierResponse.parse_obj"
+    )
 
     client.get_aggregate_carrier(
         card_type=TEST_CARD_TYPE,
@@ -443,4 +481,5 @@ def test_get_aggregate_carrier(client, mocker):
         },
     )
     mocked_check_api_error.assert_called_once()
+    mocked_parse_obj.assert_called_once()
     assert client.serial == 2
