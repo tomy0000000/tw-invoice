@@ -4,6 +4,8 @@ on:
   push:
     branches: ["main"]
     paths:
+      - ".github/workflows/test.yml"
+      - "pyproject.toml"
       - "tw_invoice/**"
       - "tests/**"
   pull_request:
