@@ -19,9 +19,11 @@ jobs:
         with:
           python-version: "3.10"
 
+      # flit install is required to generate version in last step
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip flit
+          flit install --deps develop --symlink
 
       - name: Publish package
         env:

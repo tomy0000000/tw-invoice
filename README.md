@@ -21,4 +21,4 @@ See [Wiki](https://github.com/tomy0000000/tw-invoice/wiki)
 
 The source code is released under MIT license, versions with suffix b represent beta version, use at your own risk.
 
-The author is not affiliated in any kind to the platform, or MoF in any kind.
+The author is not affiliated to MoF, or the platform in any kind.
