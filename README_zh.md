@@ -5,7 +5,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/tw_invoice?color=brightgreen)
 ![PyPI - License](https://img.shields.io/pypi/l/tw_invoice?color=brightgreen)
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tomy0000000/tw-invoice/Test?logo=Github)](https://github.com/tomy0000000/tw-invoice/actions/workflows/test.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tomy0000000/tw-invoice/test.yml?branch=main&logo=Github)](https://github.com/tomy0000000/tw-invoice/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/tomy0000000/tw-invoice?color=brightgreen&logo=codecov&logoColor=white&token=ESgHfrrk6z)](https://codecov.io/gh/tomy0000000/tw-invoice)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/tomy0000000/tw-invoice/main.svg)](https://results.pre-commit.ci/latest/github/tomy0000000/tw-invoice/main)
 
