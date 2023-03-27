@@ -123,9 +123,27 @@ class AppAPIClient(object):
         invoice_encrypt: Union[str, None] = None,
         seller_id: Union[str, None] = None,
     ):
-        """查詢發票明細 v0.5"""
+        """
+        查詢發票明細 v0.6
+        `invoice_random`: 錯誤將僅回傳發票表頭，正確將回傳完整明細
+
+        `barcode_type`: "Barcode"
+        `invoice_number`: 發票號碼
+        `invoice_date`: 發票日期
+        `invoice_random`: 發票隨機碼 (4位)
+        `invoice_term`: 發票期別， 3 位民國年+ 2 位雙數月份，如：11006
+
+        or
+
+        `barcode_type`: "QRCode"
+        `invoice_number`: 發票號碼
+        `invoice_date`: 發票日期
+        `invoice_random`: 發票隨機碼 (4位)
+        `invoice_encrypt`: 發票檢驗碼 (左側QRCode中，24位)
+        `seller_id`: 商家統編
+        """
         URL = build_api_url("invapp")
-        VERSION = 0.5
+        VERSION = 0.6
         if barcode_type == "QRCode":
             if not invoice_encrypt:
                 raise ValueError(

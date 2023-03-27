@@ -84,6 +84,7 @@ class InvoiceDetailResponse(BaseModel):
     invoiceTime: str
     buyerBan: str
     currency: str
+    amount: str
     details: Union[List[InvoiceDetail], None] = None
 
 
