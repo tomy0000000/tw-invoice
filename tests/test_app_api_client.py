@@ -238,7 +238,7 @@ def test_get_invoice_detail(client, mocker):
     mocked_session_post.assert_called_once_with(
         build_api_url("invapp"),
         data={
-            "version": 0.5,
+            "version": 0.6,
             "type": "QRCode",
             "invNum": TEST_INVOICE_NUMBER,
             "action": "qryInvDetail",
@@ -272,7 +272,7 @@ def test_get_invoice_detail(client, mocker):
     mocked_session_post.assert_called_once_with(
         build_api_url("invapp"),
         data={
-            "version": 0.5,
+            "version": 0.6,
             "type": "Barcode",
             "invNum": TEST_INVOICE_NUMBER,
             "action": "qryInvDetail",
