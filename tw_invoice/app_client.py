@@ -3,6 +3,14 @@ from time import time
 from typing import Union
 from uuid import uuid4
 
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
+from requests import Session
+from requests.adapters import HTTPAdapter, Retry
+
 from .schema import (
     AggregateCarrierResponse,
     CarrierInvoiceDonateResponse,
@@ -13,14 +21,6 @@ from .schema import (
     LotteryNumberResponse,
     LoveCodeResponse,
 )
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
-from requests import Session
-
 from .utils import (
     build_api_url,
     check_api_error,
@@ -38,6 +38,7 @@ class AppAPIClient(object):
         api_key: str,
         uuid: Union[str, None] = None,
         ts_tolerance: int = 20,
+        max_retries: int = 20,
         skip_validation: bool = False,
     ):
         self.app_id = app_id
@@ -54,6 +55,15 @@ class AppAPIClient(object):
         self.session.headers.update(
             {"Content-Type": "application/x-www-form-urlencoded"}
         )
+        adapter = HTTPAdapter()
+        adapter.max_retries = Retry(
+            total=max_retries,
+            backoff_factor=0.1,
+            allowed_methods=["POST"],
+            status_forcelist=[500, 502, 503, 504],
+            raise_on_status=False,
+        )
+        self.session.mount("https://", adapter)
 
     def get_lottery_numbers(
         self, invoice_term: str
