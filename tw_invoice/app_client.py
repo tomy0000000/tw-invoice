@@ -55,15 +55,18 @@ class AppAPIClient(object):
         self.session.headers.update(
             {"Content-Type": "application/x-www-form-urlencoded"}
         )
-        adapter = HTTPAdapter()
-        adapter.max_retries = Retry(
-            total=max_retries,
-            backoff_factor=0.1,
-            allowed_methods=["POST"],
-            status_forcelist=[500, 502, 503, 504],
-            raise_on_status=False,
+        self.session.mount(
+            "https://",
+            HTTPAdapter(
+                max_retries=Retry(
+                    total=max_retries,
+                    backoff_factor=0.1,
+                    allowed_methods=["POST"],
+                    status_forcelist=[500, 502, 503, 504],
+                    raise_on_status=False,
+                )
+            ),
         )
-        self.session.mount("https://", adapter)
 
     def get_lottery_numbers(
         self, invoice_term: str
