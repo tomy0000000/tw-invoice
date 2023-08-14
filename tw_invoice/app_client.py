@@ -85,7 +85,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = LotteryNumberResponse.parse_obj(results)
         return results
@@ -113,7 +115,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = InvoiceHeaderResponse.parse_obj(results)
         return results
@@ -185,7 +189,9 @@ class AppAPIClient(object):
             "randomNumber": invoice_random,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = InvoiceDetailResponse.parse_obj(results)
         return results
@@ -201,7 +207,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = LoveCodeResponse.parse_obj(results)
         return results
@@ -232,7 +240,9 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoicesHeaderResponse.parse_obj(results)
         return results
@@ -267,7 +277,9 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoicesDetailResponse.parse_obj(results)
         return results
@@ -304,7 +316,9 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoiceDonateResponse.parse_obj(results)
         return results
@@ -332,7 +346,9 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        results = check_api_error(self.session.post(URL, data=data, timeout=self.timeout))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = AggregateCarrierResponse.parse_obj(results)
         return results
