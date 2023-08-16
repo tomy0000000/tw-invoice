@@ -1,6 +1,6 @@
 from datetime import date
 from time import time
-from typing import Union
+from typing import Union, Tuple
 from uuid import uuid4
 
 try:
@@ -40,7 +40,7 @@ class AppAPIClient(object):
         ts_tolerance: int = 20,
         max_retries: int = 20,
         skip_validation: bool = False,
-        timeout: tuple = (3, 1),
+        timeout: Union[float, Tuple[float, float], Tuple[float, None]] = (3.0, 1.0),
     ):
         self.app_id = app_id
         self.api_key = api_key
@@ -68,6 +68,15 @@ class AppAPIClient(object):
                 )
             ),
         )
+        if isinstance(timeout, float) and timeout <= 0:
+            raise ValueError("For a float timeout, the value must be greater than 0")
+        if isinstance(timeout, tuple):
+            if len(timeout) != 2:
+                raise ValueError("timeout tuple must have 2 elements")
+            if not (isinstance(timeout[0], float) and (isinstance(timeout[1], float) or timeout[1] is None)):
+                raise ValueError("For a tuple timeout, the elements must be Tuple[float, float] or Tuple[float, None]")
+            if timeout[0] <= 0 or (timeout[1] is not None and timeout[1] <= 0):
+                raise ValueError("For a tuple timeout, both values must be greater than 0 or the second value can be None")
         self.timeout = timeout
 
     def get_lottery_numbers(
