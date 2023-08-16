@@ -40,7 +40,7 @@ class AppAPIClient(object):
         ts_tolerance: int = 20,
         max_retries: int = 20,
         skip_validation: bool = False,
-        timeout: tuple = (5, 5),
+        timeout: tuple = (3, 1),
     ):
         self.app_id = app_id
         self.api_key = api_key
