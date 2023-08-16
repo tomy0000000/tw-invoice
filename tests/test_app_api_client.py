@@ -23,6 +23,7 @@ TEST_TS_TOLERANCE = 30
 TEST_UUID = "test_uuid"
 TEST_TIMEOUT = (3.0, 1.0)
 
+
 @pytest.fixture
 def client():
     return AppAPIClient(TEST_APP_ID, TEST_API_KEY, TEST_UUID)
@@ -86,7 +87,7 @@ def test_get_lottery_numbers(client, mocker):
             "UUID": TEST_UUID,
             "appID": TEST_APP_ID,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -136,7 +137,7 @@ def test_get_invoice_header(client, mocker):
                 "UUID": TEST_UUID,
                 "appID": TEST_APP_ID,
             },
-            timeout= TEST_TIMEOUT,
+            timeout=TEST_TIMEOUT,
         )
         mocked_check_api_error.assert_called_once()
         mocked_parse_obj.assert_called_once()
@@ -253,7 +254,7 @@ def test_get_invoice_detail(client, mocker):
             "randomNumber": TEST_INVOICE_RANDOM,
             "appID": TEST_APP_ID,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -288,7 +289,7 @@ def test_get_invoice_detail(client, mocker):
             "randomNumber": TEST_INVOICE_RANDOM,
             "appID": TEST_APP_ID,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -310,7 +311,7 @@ def test_get_love_code(client, mocker):
             "UUID": TEST_UUID,
             "appID": TEST_APP_ID,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -349,7 +350,7 @@ def test_get_carrier_invoices_header(client, mocker):
             "appID": TEST_APP_ID,
             "cardEncrypt": TEST_CARD_ENCRYPT,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -399,7 +400,7 @@ def test_get_carrier_invoices_detail(client, mocker):
             "appID": TEST_APP_ID,
             "cardEncrypt": TEST_CARD_ENCRYPT,
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -451,7 +452,7 @@ def test_carrier_donate_invoice(client, mocker):
             "cardEncrypt": TEST_CARD_ENCRYPT,
             "signature": "Ydmt4alIcCLYG/VBcI+QUdyfgO5Yp8bfX6TPy5xgsVs=",
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
@@ -487,7 +488,7 @@ def test_get_aggregate_carrier(client, mocker):
             "uuid": TEST_UUID,
             "signature": "2pWN1GfP6S7oncE56OJetvpxGlE1tFYHeqgNwHmIuw4=",
         },
-        timeout= TEST_TIMEOUT,
+        timeout=TEST_TIMEOUT,
     )
     mocked_check_api_error.assert_called_once()
     mocked_parse_obj.assert_called_once()
