@@ -1,6 +1,6 @@
 from datetime import date
 from time import time
-from typing import Union
+from typing import Tuple, Union
 from uuid import uuid4
 
 try:
@@ -40,6 +40,7 @@ class AppAPIClient(object):
         ts_tolerance: int = 20,
         max_retries: int = 20,
         skip_validation: bool = False,
+        timeout: Union[float, Tuple[float, float], Tuple[float, None]] = (3, 1),
     ):
         self.app_id = app_id
         self.api_key = api_key
@@ -67,6 +68,7 @@ class AppAPIClient(object):
                 )
             ),
         )
+        self.timeout = timeout
 
     def get_lottery_numbers(
         self, invoice_term: str
@@ -83,7 +85,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = LotteryNumberResponse.parse_obj(results)
         return results
@@ -111,7 +115,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = InvoiceHeaderResponse.parse_obj(results)
         return results
@@ -183,7 +189,9 @@ class AppAPIClient(object):
             "randomNumber": invoice_random,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = InvoiceDetailResponse.parse_obj(results)
         return results
@@ -199,7 +207,9 @@ class AppAPIClient(object):
             "UUID": self.uuid,
             "appID": self.app_id,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = LoveCodeResponse.parse_obj(results)
         return results
@@ -230,7 +240,9 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoicesHeaderResponse.parse_obj(results)
         return results
@@ -265,7 +277,9 @@ class AppAPIClient(object):
             "appID": self.app_id,
             "cardEncrypt": card_encrypt,
         }
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoicesDetailResponse.parse_obj(results)
         return results
@@ -302,7 +316,9 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = CarrierInvoiceDonateResponse.parse_obj(results)
         return results
@@ -330,7 +346,9 @@ class AppAPIClient(object):
         signature = sign(data, self.api_key)
         data["signature"] = signature
         self.serial += 1
-        results = check_api_error(self.session.post(URL, data=data))
+        results = check_api_error(
+            self.session.post(URL, data=data, timeout=self.timeout)
+        )
         if not self.skip_validation:
             results = AggregateCarrierResponse.parse_obj(results)
         return results
